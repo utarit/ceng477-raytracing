@@ -11,6 +11,7 @@ Shape::Shape(int id, int matIndex)
 {
 }
 
+
 Sphere::Sphere(void)
 {}
 
@@ -27,12 +28,36 @@ Note that ReturnVal structure should hold the information related to the interse
 You should to declare the variables in ReturnVal structure you think you will need. It is in defs.h file. */
 ReturnVal Sphere::intersect(const Ray & ray) const
 {
-	/***********************************************
-     *                                             *
-	 * TODO: Implement this function               *
-     *                                             *
-     ***********************************************
-	 */
+	a = dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
+	Vector3f tmp_v = sub3f(ray.origin, center);
+	b = 2 * dotProduct(ray.direction, tmp_v);
+	c = dotProduct(tmp_v, tmp_v) - radius * radius;
+
+	float delta = b * b - 4 * a * c;
+	if (delta < 0) 
+	{
+		ReturnVal result = { 0, null, null };
+		return result;
+	}
+	else 
+	{
+		t = (-b - sqrt(delta)) / (2.0 * a);
+		Vector3f point = Ray::getPoint(t);
+		Vector3f normal = sub3f(p, center);
+
+		if (delta > 0) 
+		{
+			ReturnVal result = { 2, point, normal };
+			return result;
+		}
+		else 
+		{
+			ReturnVal result = { 1, point, normal };
+			return result;
+		}
+	}
+		
+
 }
 
 Triangle::Triangle(void)

@@ -9,12 +9,10 @@ for example, coordinate of the intersection point, surface normal at the interse
 Think about the variables you will need for this purpose and declare them here inside of this structure. */
 typedef struct ReturnVal
 {
-	/***********************************************
-     *                                             *
-	 * TODO: Implement this structure              *
-     *                                             *
-     ***********************************************
-	 */
+	int intersectionStatus; // 0:no intersection 1:One intersection 2:Two intersections
+	Vector3f point;
+	Vector3f normalVector;
+
 } ReturnVal;
 
 /* 3 dimensional vector holding floating point numbers.
@@ -40,6 +38,22 @@ typedef struct Vector3f
 	};
 } Vector3f;
 
+float dotProduct(Vector3f v1, Vector3f v2)
+{
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+Vector3f sub3f(Vector3f v1, Vector3f v2)
+{
+	Vector3f result = { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
+	return result;
+}
+
+Vector3f add3f(Vector3f v1, Vector3f v2)
+{
+	Vector3f result = { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
+	return result;
+}
 //
 // The global variable through which you can access the scene data
 //
