@@ -2,7 +2,7 @@
 #define _CAMERA_H_
 
 #include "Ray.h"
-#include "defs.h"
+//#include "defs.h"
 
 // Structure for holding variables related to the image plane
 typedef struct ImagePlane

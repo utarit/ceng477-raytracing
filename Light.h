@@ -3,6 +3,7 @@
 
 #include "defs.h"
 
+
 using namespace std;
 
 // Class for point lights

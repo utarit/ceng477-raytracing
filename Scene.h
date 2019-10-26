@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Ray.h"
-#include "defs.h"
+//#include "defs.h"
 
 // Forward declarations to avoid cyclic references
 class Camera;

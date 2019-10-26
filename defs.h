@@ -1,19 +1,15 @@
 #ifndef _DEFS_H_
 #define _DEFS_H_
 
+#include "math.h"
+
 class Scene;
 
 /* Structure to hold return value from ray intersection routine. 
 This should hold information related to the intersection point, 
 for example, coordinate of the intersection point, surface normal at the intersection point etc. 
 Think about the variables you will need for this purpose and declare them here inside of this structure. */
-typedef struct ReturnVal
-{
-	int intersectionStatus; // 0:no intersection 1:One intersection 2:Two intersections
-	Vector3f point;
-	Vector3f normalVector;
 
-} ReturnVal;
 
 /* 3 dimensional vector holding floating point numbers.
 Used for both coordinates and color. 
@@ -36,24 +32,22 @@ typedef struct Vector3f
 		float z;
 		float b;
 	};
+	Vector3f operator- (Vector3f &rhs);
+	Vector3f operator+ (Vector3f &rhs);
+	Vector3f operator= (Vector3f &rhs);
+	float dotProduct(Vector3f &rhs);
+	Vector3f crossProduct(Vector3f &rhs);
+
 } Vector3f;
 
-float dotProduct(Vector3f v1, Vector3f v2)
+typedef struct ReturnVal
 {
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
+	int intersectionStatus; // 0:no intersection 1:One intersection 2:Two intersections
+	Vector3f point;
+	Vector3f normalVector;
 
-Vector3f sub3f(Vector3f v1, Vector3f v2)
-{
-	Vector3f result = { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
-	return result;
-}
+} ReturnVal;
 
-Vector3f add3f(Vector3f v1, Vector3f v2)
-{
-	Vector3f result = { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
-	return result;
-}
 //
 // The global variable through which you can access the scene data
 //
