@@ -24,7 +24,10 @@ void Scene::renderScene(void)
 		{
 			for(int x = 0; x < cam->imgPlane.nx; x++)
 			{
+<<<<<<< HEAD
 				std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
+=======
+>>>>>>> 26a8c4328652d057fc8d76015ee1fda0c985ab9b
 				Ray ray = cam->getPrimaryRay(y, x);
 				float tmin = (unsigned long) -1;
 				Shape *object = NULL;
@@ -53,8 +56,9 @@ void Scene::renderScene(void)
 				}
 			}
 
-			image.saveImage(cam->imageName);
 		}
+			image.saveImage(cam->imageName);
+
 	}
 }
 
