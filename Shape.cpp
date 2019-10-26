@@ -31,8 +31,8 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 {
 	float a = ray.direction.dotProduct(ray.direction); //dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
 	Vector3f tmp_v = ray.origin- center;
-	auto b = 2 * ray.direction.dotProduct(tmp_v);
-	auto c = tmp_v.dotProduct(tmp_v) - radius * radius;
+	float b = 2 * ray.direction.dotProduct(tmp_v);
+	float c = tmp_v.dotProduct(tmp_v) - radius * radius;
 
 	float delta = b * b - 4 * a * c;
 	if (delta < 0) 
@@ -69,9 +69,30 @@ Triangle::Triangle(void)
 Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, vector<Vector3f> *pVertices)
     : Shape(id, matIndex)
 {
-	auto p1 = pVertices[p1Index - 1];
-	auto p2 = pVertices[p2Index - 2];
-	auto p3 = pVertices[p3Index - 3];
+	v1 = pVertices->at(p1Index - 1);
+	v2 = pVertices->at(p2Index - 1);
+	v3 = pVertices->at(p3Index - 1);
+	normal = (v2-v1).crossProduct(v3-v1);
+	area = 1/2 * (normal);
+}
+
+float Triangle::sign (Vector3f p1, Vector3f p2, Vector3f p3){
+	    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}
+
+bool Triangle::checkIntersection (Vector3f pt)
+{
+    float d1, d2, d3;
+    bool has_neg, has_pos;
+
+    d1 = sign(pt, v1, v2);
+    d2 = sign(pt, v2, v3);
+    d3 = sign(pt, v3, v1);
+
+    has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+    has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+    return !(has_neg && has_pos);
 }
 
 /* Triangle-ray intersection routine. You will implement this. 
@@ -79,12 +100,7 @@ Note that ReturnVal structure should hold the information related to the interse
 You should to declare the variables in ReturnVal structure you think you will need. It is in defs.h file. */
 ReturnVal Triangle::intersect(const Ray & ray) const
 {
-	/***********************************************
-     *                                             *
-	 * TODO: Implement this function               *
-     *                                             *
-     ***********************************************
-	 */
+	Vector3f normal;
 }
 
 Mesh::Mesh()

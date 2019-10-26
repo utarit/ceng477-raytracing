@@ -46,9 +46,13 @@ public:
 	ReturnVal intersect(const Ray & ray) const; // Will take a ray and return a structure related to the intersection information. You will implement this. 
 
 private:
-	Vector3f p1;
-	Vector3f p2;
-	Vector3f p3;
+	Vector3f v1;
+	Vector3f v2;
+	Vector3f v3;
+	Vector3f normal;
+	float area;
+	float sign (Vector3f p1, Vector3f p2, Vector3f p3);
+	bool  checkIntersection (Vector3f pt);
 };
 
 // Class for mesh
