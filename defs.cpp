@@ -12,7 +12,12 @@ Vector3f Vector3f::operator= (const Vector3f &rhs){
 		y = rhs.y;
 		z = rhs.z;
 	}
-
+Vector3f Vector3f::operator* (const int &t) const{
+	return {t*x, t*y, t*z};
+}
+Vector3f Vector3f::operator* (const float &t) const{
+	return {t*x, t*y, t*z};
+}
 float Vector3f::dotProduct(const Vector3f &rhs) const {
 		return rhs.x * x + rhs.y * y + rhs.z * z;
 	}
