@@ -72,6 +72,7 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
 	v1 = pVertices->at(p1Index - 1);
 	v2 = pVertices->at(p2Index - 1);
 	v3 = pVertices->at(p3Index - 1);
+
 	normal = (v2-v1).crossProduct(v3-v1);
 	area = 1/2 * (normal.length());
 }
@@ -138,10 +139,10 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	Vector3f point = ray.origin + ray.direction*t;
 	ReturnVal result = {1, point, normal, t};
 	return result;
+
 }
 
-Mesh::Mesh()
-{}
+Mesh::Mesh(){}
 
 /* Constructor for mesh. You will implement this. */
 Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices)
