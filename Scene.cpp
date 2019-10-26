@@ -18,23 +18,21 @@ void Scene::renderScene(void)
 	{
 		std::cout << "Hello\n";
 		Camera *cam = cameras.at(cam_i);
-		Image image = {cam->imgPlane.nx, cam->imgPlane.ny};
+		Image image = {cam->imgPlane.nx, cam->imgPlane.ny}; 
 
 		for(int y = 0; y < cam->imgPlane.ny; y++)
 		{
 			for(int x = 0; x < cam->imgPlane.nx; x++)
 			{
-<<<<<<< HEAD
-				std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
-=======
->>>>>>> 26a8c4328652d057fc8d76015ee1fda0c985ab9b
-				Ray ray = cam->getPrimaryRay(y, x);
+				// std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
+				Ray ray = cam->getPrimaryRay(y,x);
 				float tmin = (unsigned long) -1;
 				Shape *object = NULL;
-				for(int i = 0; i < objects.size(); i++)
+				ReturnVal val;
+				for(auto &obj : objects)
 				{
-					Shape *obj = objects.at(i);
-					ReturnVal val = obj->intersect(ray);
+					// Shape *obj = objects.at(i);
+					val = obj->intersect(ray);
 					if(val.intersectionStatus > 0 && val.t < tmin)
 					{
 						tmin = val.t;
@@ -42,14 +40,34 @@ void Scene::renderScene(void)
 					}
 				}
 
-				if(object != NULL){
-					Color color = {ambientLight.r, ambientLight.g, ambientLight.b};
-					image.setPixelValue(y, x, color);
-					// for(int j = 0; j < lights.size(); j++)
-					// {
-					// 	Light *light = lights.at(j);
-					// }
-				} else 
+				if(object != NULL)
+				{
+					// std::cout << "Materials Size: " << materials.size() << " Object Index: " << object->matIndex
+					Vector3f ambientShading = ambientLight *  materials.at(object->matIndex-1)->ambientRef;
+					for(auto &light: lights)
+					{
+						Vector3f light_vector = light->position - val.point;
+						Ray s = {val.point + light_vector*shadowRayEps, light_vector};
+						float t_light = s.gett(light->position);
+						for(auto &obj2 : objects)
+						{
+							ReturnVal shadow_val = obj2->intersect(s);
+							if(shadow_val.intersectionStatus > 0 && shadow_val.t < t_light)
+							{
+								break;
+							}
+
+						}
+						Vector3f diffuse = materials.at(object->matIndex-1)->diffuseRef*
+						(light->computeLightContribution(val.point) * max(0.0f, light_vector.dotProduct(val.normalVector)));
+						ambientShading = ambientShading + diffuse;
+						// std::cout << val.normalVector.x << " " << val.normalVector.y << " " << val.normalVector.z << std::endl;
+						// std::cout << "Light: " << light_vector.x << " " << light_vector.y << " " << light_vector.z << std::endl;
+						Color color = {ambientShading.r, ambientShading.g, ambientShading.b};
+						image.setPixelValue(y, x, color);
+					}
+				} 
+				else 
 				{
 
 					image.setPixelValue(y, x, {backgroundColor.r, backgroundColor.g, backgroundColor.b});

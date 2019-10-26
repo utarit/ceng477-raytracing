@@ -36,7 +36,7 @@ Ray Camera::getPrimaryRay(int row, int col) const
      float s_v = (row + .5) * s_v_const;
 
 
-     auto s = q + u * s_u - up * s_v;
+     Vector3f s = q + u * s_u - up * s_v;
 	
      return {pos, s - pos};
      

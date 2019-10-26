@@ -30,7 +30,7 @@ You should to declare the variables in ReturnVal structure you think you will ne
 ReturnVal Sphere::intersect(const Ray & ray) const
 {
 	float a = ray.direction.dotProduct(ray.direction); //dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
-	Vector3f tmp_v = ray.origin- center;
+	Vector3f tmp_v = ray.origin - center;
 	float b = 2 * ray.direction.dotProduct(tmp_v);
 	float c = tmp_v.dotProduct(tmp_v) - radius * radius;
 
@@ -41,9 +41,14 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	}
 	else 
 	{
-		float t = (-b - sqrt(delta)) / (2.0 * a);
+		float t = (-b - sqrt(delta)) / (2.0 * a+ pScene->intTestEps);
 		Vector3f point = ray.getPoint(t);
 		Vector3f normal = (point- center);
+		// std::cout << "Delta: " << delta << std::endl;
+		// std::cout << "T: " << t << std::endl;
+		// std::cout << "Point: " << point.x << " " << point.y << std::endl;
+		// std::cout << "Normal: " << normal.x << " " << normal.y << std::endl;
+		// std::cout << "-----------------------" << std::endl;
 		return {
 			delta>0?2:1, point, normal, t
 		};

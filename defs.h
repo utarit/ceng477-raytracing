@@ -36,6 +36,7 @@ typedef struct Vector3f
 	Vector3f operator+ (const Vector3f &rhs)const;
 	Vector3f operator* (const int &t) const;
 	Vector3f operator* (const float &t) const;
+	Vector3f operator*(const Vector3f &rhs) const;
 	Vector3f operator= (const Vector3f &rhs);
 	float length() const;
 	float dotProduct(const Vector3f &rhs) const;
