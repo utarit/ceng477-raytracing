@@ -32,11 +32,11 @@ typedef struct Vector3f
 		float z;
 		float b;
 	};
-	Vector3f operator- (Vector3f &rhs);
-	Vector3f operator+ (Vector3f &rhs);
-	Vector3f operator= (Vector3f &rhs);
-	float dotProduct(Vector3f &rhs);
-	Vector3f crossProduct(Vector3f &rhs);
+	Vector3f operator- (const Vector3f &rhs)const;
+	Vector3f operator+ (const Vector3f &rhs)const;
+	Vector3f operator= (const Vector3f &rhs);
+	float dotProduct(const Vector3f &rhs) const;
+	Vector3f crossProduct(const Vector3f &rhs) const;
 
 } Vector3f;
 

@@ -29,10 +29,10 @@ Note that ReturnVal structure should hold the information related to the interse
 You should to declare the variables in ReturnVal structure you think you will need. It is in defs.h file. */
 ReturnVal Sphere::intersect(const Ray & ray) const
 {
-	float a = ray.direction.dotProduct(ray.direction);//dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
-	Vector3f tmp_v = sub3f(ray.origin, center);
-	auto b = 2 * dotProduct(ray.direction, tmp_v);
-	auto c = dotProduct(tmp_v, tmp_v) - radius * radius;
+	float a = ray.direction.dotProduct(ray.direction); //dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
+	Vector3f tmp_v = ray.origin- center;
+	auto b = 2 * ray.direction.dotProduct(tmp_v);
+	auto c = tmp_v.dotProduct(tmp_v) - radius * radius;
 
 	float delta = b * b - 4 * a * c;
 	if (delta < 0) 
@@ -43,7 +43,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	{
 		auto t = (-b - sqrt(delta)) / (2.0 * a);
 		Vector3f point = ray.getPoint(t);
-		Vector3f normal = sub3f(point, center);
+		Vector3f normal = (point- center);
 		return {
 			delta>0?2:1, point, normal
 		};
