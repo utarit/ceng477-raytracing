@@ -72,6 +72,7 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
 	v1 = pVertices->at(p1Index - 1);
 	v2 = pVertices->at(p2Index - 1);
 	v3 = pVertices->at(p3Index - 1);
+
 	normal = (v2-v1).crossProduct(v3-v1);
 	//area = 1/2 * (normal);
 }
@@ -101,10 +102,13 @@ You should to declare the variables in ReturnVal structure you think you will ne
 ReturnVal Triangle::intersect(const Ray & ray) const
 {
 	Vector3f normal;
+	auto col_1 = v1 - ray.origin;
+	auto col_2 = v1 - v2;
+	auto col_3 = v1 - v3;
+
 }
 
-Mesh::Mesh()
-{}
+Mesh::Mesh(){}
 
 /* Constructor for mesh. You will implement this. */
 Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices)

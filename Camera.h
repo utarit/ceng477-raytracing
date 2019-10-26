@@ -34,6 +34,15 @@ public:
 	Ray getPrimaryRay(int row, int col) const;
 
 private:
+    Vector3f pos;
+    Vector3f gaze;
+    Vector3f up;
+    Vector3f m;
+    Vector3f q;
+    Vector3f u;
+    float s_u_const;
+    float s_v_const;
+
     //
 	// You can add member functions and variables here
     //
