@@ -11,6 +11,7 @@ Vector3f Vector3f::operator= (const Vector3f &rhs){
 		x = rhs.x;
 		y = rhs.y;
 		z = rhs.z;
+		return *this;
 	}
 Vector3f Vector3f::operator* (const int &t) const{
 	return {t*x, t*y, t*z};
