@@ -148,7 +148,10 @@ Mesh::Mesh(){}
 Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIndices, vector<Vector3f> *pVertices)
     : Shape(id, matIndex)
 {
-	triangles = faces;
+	// triangles = faces;
+	for(int i = 0; i < faces.size(); i++){
+		triangles.push_back(faces.at(i));
+	}
 
 }
 

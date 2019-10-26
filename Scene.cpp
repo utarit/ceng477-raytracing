@@ -16,7 +16,7 @@ void Scene::renderScene(void)
 {
 	for(int cam_i = 0; cam_i < cameras.size(); cam_i++)
 	{
-		// std::cout << "Hello\n";
+		std::cout << "Hello\n";
 		Camera *cam = cameras.at(cam_i);
 		Image image = {cam->imgPlane.nx, cam->imgPlane.ny};
 
@@ -24,7 +24,7 @@ void Scene::renderScene(void)
 		{
 			for(int x = 0; x < cam->imgPlane.nx; x++)
 			{
-				// std::cout << "Pixel no: " << y << ", " << x << " Obj size: " << objects.size() <<  std::endl;
+				std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
 				Ray ray = cam->getPrimaryRay(y, x);
 				float tmin = (unsigned long) -1;
 				Shape *object = NULL;
