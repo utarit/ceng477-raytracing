@@ -3,6 +3,7 @@
 #include "Light.h"
 #include "Material.h"
 #include "Shape.h"
+#include "Image.h"
 #include "tinyxml2.h"
 
 using namespace tinyxml2;
@@ -13,12 +14,48 @@ using namespace tinyxml2;
  */
 void Scene::renderScene(void)
 {
-	/***********************************************
-     *                                             *
-	 * TODO: Implement this function               *
-     *                                             *
-     ***********************************************
-	 */
+	for(int cam_i = 0; cam_i < cameras.size(); cam_i++)
+	{
+		// std::cout << "Hello\n";
+		Camera *cam = cameras.at(cam_i);
+		Image image = {cam->imgPlane.nx, cam->imgPlane.ny};
+
+		for(int y = 0; y < cam->imgPlane.ny; y++)
+		{
+			for(int x = 0; x < cam->imgPlane.nx; x++)
+			{
+				// std::cout << "Pixel no: " << y << ", " << x << " Obj size: " << objects.size() <<  std::endl;
+				Ray ray = cam->getPrimaryRay(y, x);
+				float tmin = (unsigned long) -1;
+				Shape *object = NULL;
+				for(int i = 0; i < objects.size(); i++)
+				{
+					Shape *obj = objects.at(i);
+					ReturnVal val = obj->intersect(ray);
+					if(val.intersectionStatus > 0 && val.t < tmin)
+					{
+						tmin = val.t;
+						object = obj;
+					}
+				}
+
+				if(object != NULL){
+					Color color = {ambientLight.r, ambientLight.g, ambientLight.b};
+					image.setPixelValue(y, x, color);
+					// for(int j = 0; j < lights.size(); j++)
+					// {
+					// 	Light *light = lights.at(j);
+					// }
+				} else 
+				{
+
+					image.setPixelValue(y, x, {backgroundColor.r, backgroundColor.g, backgroundColor.b});
+				}
+			}
+
+			image.saveImage(cam->imageName);
+		}
+	}
 }
 
 // Parses XML file. 

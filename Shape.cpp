@@ -41,7 +41,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	}
 	else 
 	{
-		auto t = (-b - sqrt(delta)) / (2.0 * a);
+		float t = (-b - sqrt(delta)) / (2.0 * a);
 		Vector3f point = ray.getPoint(t);
 		Vector3f normal = (point- center);
 		return {
@@ -133,7 +133,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	float gamma = (i*akjb +e*jcal + d*blkc) / M;
 	float t = (f*akjb+e*jcal+d*blkc) / M;
 
-	if(t < 0 || t > 1) return {0}; // Tmin tmax'a bak
+	//if(t < 0 || t > 1) return {0}; // Tmin tmax'a bak
 	if(gamma < 0 || gamma > 1) return {0};
 	if(beta < 0 || beta > 1 - gamma) return {0};
 	Vector3f point = ray.origin + ray.direction*t;

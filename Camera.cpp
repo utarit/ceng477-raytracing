@@ -8,12 +8,6 @@ Camera::Camera(int id,                      // Id of the camera
                const ImagePlane& imgPlane)  // Image plane parameters
 
 {
-	/***********************************************
-     *                                             *
-	 * TODO: Implement this function               *
-     *                                             *
-     ***********************************************
-	 */
      this->id = id;
      (*this->imageName) = *imageName;
      this->imgPlane = imgPlane;
@@ -31,7 +25,7 @@ Camera::Camera(int id,                      // Id of the camera
 /* Takes coordinate of an image pixel as row and col, and
  * returns the ray going through that pixel. 
  */
-Ray Camera::getPrimaryRay(int col, int row) const
+Ray Camera::getPrimaryRay(int row, int col) const
 {
      float s_u = (col + .5) * s_u_const;
      float s_v = (row + .5) * s_v_const;
@@ -41,11 +35,5 @@ Ray Camera::getPrimaryRay(int col, int row) const
 	
      return {pos, s - pos};
      
-     /***********************************************
-     *                                             *
-	 * TODO: Implement this function               *
-     *                                             *
-     ***********************************************
-	 */
 }
 

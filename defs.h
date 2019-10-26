@@ -49,7 +49,6 @@ typedef struct ReturnVal
 	Vector3f point;
 	Vector3f normalVector;
 	float t;
-	Shape shape;
 
 } ReturnVal;
 
