@@ -43,7 +43,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	{
 		float t = (-b - sqrt(delta)) / (2.0 * a+ pScene->intTestEps);
 		Vector3f point = ray.getPoint(t);
-		Vector3f normal = (point- center);
+		Vector3f normal = (point- center) * (1/radius);
 		// std::cout << "Delta: " << delta << std::endl;
 		// std::cout << "T: " << t << std::endl;
 		// std::cout << "Point: " << point.x << " " << point.y << std::endl;

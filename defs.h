@@ -5,6 +5,8 @@
 #include <iostream>
 class Scene;
 
+
+#define print(name, vector) std::cout << name << ": " << vector.r << ", " << vector.g << ", " << vector.b << std::endl
 /* Structure to hold return value from ray intersection routine. 
 This should hold information related to the intersection point, 
 for example, coordinate of the intersection point, surface normal at the intersection point etc. 
@@ -37,7 +39,7 @@ typedef struct Vector3f
 	Vector3f operator* (const int &t) const;
 	Vector3f operator* (const float &t) const;
 	Vector3f operator*(const Vector3f &rhs) const;
-	Vector3f operator= (const Vector3f &rhs);
+	void operator= (const Vector3f &rhs);
 	float length() const;
 	float dotProduct(const Vector3f &rhs) const;
 	Vector3f crossProduct(const Vector3f &rhs) const;

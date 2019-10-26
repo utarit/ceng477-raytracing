@@ -14,9 +14,9 @@ typedef union Color
 {
     struct
     {
-        unsigned char red;
-        unsigned char grn;
-        unsigned char blu;
+        unsigned char r;
+        unsigned char g;
+        unsigned char b;
     };
 
     unsigned char channel[3];

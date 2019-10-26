@@ -5,6 +5,7 @@
 #include "Shape.h"
 #include "Image.h"
 #include "tinyxml2.h"
+#include <cmath>
 
 using namespace tinyxml2;
 
@@ -14,58 +15,63 @@ using namespace tinyxml2;
  */
 void Scene::renderScene(void)
 {
-	for(int cam_i = 0; cam_i < cameras.size(); cam_i++)
+	for(auto &cam: cameras)
 	{
-		std::cout << "Hello\n";
-		Camera *cam = cameras.at(cam_i);
 		Image image = {cam->imgPlane.nx, cam->imgPlane.ny}; 
 
-		for(int y = 0; y < cam->imgPlane.ny; y++)
+		for(int y = cam->imgPlane.ny; y > 0; y--)
 		{
 			for(int x = 0; x < cam->imgPlane.nx; x++)
 			{
 				// std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
-				Ray ray = cam->getPrimaryRay(y,x);
+				Ray ray = cam->getPrimaryRay(y, x);
 				float tmin = (unsigned long) -1;
 				Shape *object = NULL;
 				ReturnVal val;
 				for(auto &obj : objects)
 				{
-					// Shape *obj = objects.at(i);
-					val = obj->intersect(ray);
-					if(val.intersectionStatus > 0 && val.t < tmin)
+					auto val_tmp = obj->intersect(ray);
+					if(val_tmp.intersectionStatus > 0 && val_tmp.t < tmin)
 					{
-						tmin = val.t;
+						tmin = val_tmp.t;
 						object = obj;
+						val = val_tmp;
 					}
 				}
 
 				if(object != NULL)
 				{
-					// std::cout << "Materials Size: " << materials.size() << " Object Index: " << object->matIndex
-					Vector3f ambientShading = ambientLight *  materials.at(object->matIndex-1)->ambientRef;
+					Vector3f shading = ambientLight *  materials.at(object->matIndex-1)->ambientRef;
 					for(auto &light: lights)
 					{
 						Vector3f light_vector = light->position - val.point;
 						Ray s = {val.point + light_vector*shadowRayEps, light_vector};
 						float t_light = s.gett(light->position);
+						bool contribute = true;
 						for(auto &obj2 : objects)
 						{
 							ReturnVal shadow_val = obj2->intersect(s);
-							if(shadow_val.intersectionStatus > 0 && shadow_val.t < t_light)
+							if(shadow_val.intersectionStatus > 0 && shadow_val.t > 0  && shadow_val.t < t_light)
 							{
+								contribute = false;
 								break;
 							}
 
 						}
-						Vector3f diffuse = materials.at(object->matIndex-1)->diffuseRef*
-						(light->computeLightContribution(val.point) * max(0.0f, light_vector.dotProduct(val.normalVector)));
-						ambientShading = ambientShading + diffuse;
-						// std::cout << val.normalVector.x << " " << val.normalVector.y << " " << val.normalVector.z << std::endl;
-						// std::cout << "Light: " << light_vector.x << " " << light_vector.y << " " << light_vector.z << std::endl;
-						Color color = {ambientShading.r, ambientShading.g, ambientShading.b};
-						image.setPixelValue(y, x, color);
+						if (contribute){
+							Vector3f diffuse = materials.at(object->matIndex-1)->diffuseRef;
+							auto lightContr = light->computeLightContribution(val.point);
+							auto cos_th = max(0.0f, light_vector.dotProduct(val.normalVector));
+							shading = shading + diffuse * cos_th * lightContr;
+							//print("ambientShading", ambientShading);
+						}
 					}
+					Color color = {
+						(unsigned char)min(max(shading.x, 0.0f), 255.0f), 
+						(unsigned char)min(max(shading.y, 0.0f), 255.0f), 
+						(unsigned char)min(max(shading.z, 0.0f), 255.0f)
+						};
+					image.setPixelValue(y, x, color);
 				} 
 				else 
 				{
