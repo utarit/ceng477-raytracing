@@ -73,7 +73,7 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
 	v2 = pVertices->at(p2Index - 1);
 	v3 = pVertices->at(p3Index - 1);
 	normal = (v2-v1).crossProduct(v3-v1);
-	area = 1/2 * (normal);
+	//area = 1/2 * (normal);
 }
 
 float Triangle::sign (Vector3f p1, Vector3f p2, Vector3f p3){
