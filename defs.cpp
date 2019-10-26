@@ -28,3 +28,7 @@ Vector3f Vector3f::crossProduct(const Vector3f &rhs) const {
 		result.z = x * rhs.y - y * rhs.x;
 		return result;
     }
+
+float Vector3f::length() const {
+	return sqrt(x*x + y*y+ z*z);
+}

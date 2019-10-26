@@ -51,8 +51,8 @@ private:
 	Vector3f v3;
 	Vector3f normal;
 	float area;
-	float sign (Vector3f p1, Vector3f p2, Vector3f p3);
-	bool  checkIntersection (Vector3f pt);
+	// float sign (Vector3f p1, Vector3f p2, Vector3f p3);
+	// bool  checkIntersection (Vector3f pt);
 };
 
 // Class for mesh
@@ -65,6 +65,7 @@ public:
 
 private:
 	// Write any other stuff here
+	vector<Triangle> triangles;
 };
 
 #endif
