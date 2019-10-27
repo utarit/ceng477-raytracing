@@ -41,6 +41,7 @@ public:
 
 private:
     // Write any other stuff here
+	static void renderPixel(int col, int row);
 };
 
 #endif

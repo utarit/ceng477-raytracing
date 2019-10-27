@@ -58,6 +58,9 @@ typedef struct ReturnVal
 //
 // The global variable through which you can access the scene data
 //
+
+float determinant(const Vector3f &v1, const Vector3f &v2, const Vector3f &v3);
+
 extern Scene* pScene;
 
 #endif

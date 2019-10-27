@@ -49,6 +49,8 @@ private:
 	Vector3f v1;
 	Vector3f v2;
 	Vector3f v3;
+	Vector3f ac;
+	Vector3f ab;
 	Vector3f normal;
 	float area;
 	// float sign (Vector3f p1, Vector3f p2, Vector3f p3);

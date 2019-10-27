@@ -36,3 +36,9 @@ float Vector3f::length() const {
 	Vector3f Vector3f::operator*(const Vector3f &rhs) const {
 		return {x*rhs.x, y*rhs.y, z*rhs.z};
 	}
+
+float determinant(const Vector3f &v1, const Vector3f &v2, const Vector3f &v3) {
+	return  v1.x * (v2.y * v3.z - v2.z * v3.y) + 
+			-v1.y * (v2.x * v3.z - v2.z * v3.x) +
+			v1.z * (v2.x * v3.y - v2.y * v3.x);
+}

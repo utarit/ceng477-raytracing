@@ -19,14 +19,14 @@ void Scene::renderScene(void)
 	{
 		Image image = {cam->imgPlane.nx, cam->imgPlane.ny}; 
 
-		for(int y = cam->imgPlane.ny; y > 0; y--)
+		for(int y = 0; y < cam->imgPlane.ny; y++)
 		{
 			for(int x = 0; x < cam->imgPlane.nx; x++)
 			{
 				// std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
 				Ray ray = cam->getPrimaryRay(y, x);
 				float tmin = (unsigned long) -1;
-				Shape *object = NULL;
+				Shape *object = nullptr;
 				ReturnVal val;
 				for(auto &obj : objects)
 				{
@@ -39,44 +39,57 @@ void Scene::renderScene(void)
 					}
 				}
 
-				if(object != NULL)
+				if(object)
 				{
-					Vector3f shading = ambientLight *  materials.at(object->matIndex-1)->ambientRef;
+					auto material = materials.at(object->matIndex-1);
+					Vector3f shading = ambientLight *  material->ambientRef;
 					for(auto &light: lights)
 					{
 						Vector3f light_vector = light->position - val.point;
+						light_vector = light_vector * (1/light_vector.length());
 						Ray s = {val.point + light_vector*shadowRayEps, light_vector};
 						float t_light = s.gett(light->position);
 						bool contribute = true;
 						for(auto &obj2 : objects)
 						{
 							ReturnVal shadow_val = obj2->intersect(s);
-							if(shadow_val.intersectionStatus > 0 && shadow_val.t > 0  && shadow_val.t < t_light)
+							if(shadow_val.intersectionStatus > 0 && shadow_val.t < t_light)
 							{
+								if (shadow_val.t < pScene->intTestEps ) {
+									std::cout << "shadow val t si intesttepsden küçük " << shadow_val.t << ">" << pScene->intTestEps << std::endl;
+									continue;
+								}
 								contribute = false;
 								break;
 							}
-
 						}
 						if (contribute){
-							Vector3f diffuse = materials.at(object->matIndex-1)->diffuseRef;
+							Vector3f diffuse = material->diffuseRef;
 							auto lightContr = light->computeLightContribution(val.point);
 							auto cos_th = max(0.0f, light_vector.dotProduct(val.normalVector));
-							shading = shading + diffuse * cos_th * lightContr;
-							//print("ambientShading", ambientShading);
+							Vector3f h = light_vector - ray.direction;
+							h = h * (1/h.length());
+							Vector3f ks = material->specularRef;
+							float cosa = pow(max(0.0f, val.normalVector.dotProduct(h)), material->phongExp);
+							shading = shading + diffuse * cos_th * lightContr + (ks*lightContr) *cosa;
+							// specular
+							
 						}
 					}
-					Color color = {
-						(unsigned char)min(max(shading.x, 0.0f), 255.0f), 
+					image.setPixelValue(x, y, {
+						(unsigned char)min(max(shading.x, 0.0f), 255.0f),
 						(unsigned char)min(max(shading.y, 0.0f), 255.0f), 
 						(unsigned char)min(max(shading.z, 0.0f), 255.0f)
-						};
-					image.setPixelValue(y, x, color);
+						});
 				} 
 				else 
 				{
-
-					image.setPixelValue(y, x, {backgroundColor.r, backgroundColor.g, backgroundColor.b});
+					image.setPixelValue(x, y, 
+					{
+						(unsigned char)min(max(backgroundColor.r, 0.0f), 255.0f),
+						(unsigned char)min(max(backgroundColor.g, 0.0f), 255.0f), 
+						(unsigned char)min(max(backgroundColor.b, 0.0f), 255.0f)
+						});
 				}
 			}
 

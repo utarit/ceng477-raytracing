@@ -12,17 +12,7 @@ Camera::Camera(int id,                      // Id of the camera
      while(*(imName + i)) {
           imageName[i++] = *(imName + i);
      }
-     /*
-     • u = (1, 0, 0)
-     • v = (0, 1, 0)
-     • w = (0, 0, 1)
-     • e = (0, 0, 0)
-     • nx = 1024
-     • ny = 768
-     • l = -1, r = 1
-     • b = -1, t = 1
-     • distance = 1
-     */
+     
      imageName[i] = 0;
      this->id = id;
      this->imgPlane = imgPlane;
@@ -31,11 +21,11 @@ Camera::Camera(int id,                      // Id of the camera
      this->up = up; // v
 
      u = up.crossProduct(gaze * -1);
+     print("gaze", gaze);
      m = pos + gaze * imgPlane.distance;
-     q = this->m + u * imgPlane.left + up * imgPlane.top;
+     q = m + u * imgPlane.left + up * imgPlane.top;
      s_u_const = (imgPlane.right - imgPlane.left) / imgPlane.nx;
      s_v_const = (imgPlane.top - imgPlane.bottom) / imgPlane.ny;
-     
 }
 
 /* Takes coordinate of an image pixel as row and col, and
@@ -45,7 +35,6 @@ Ray Camera::getPrimaryRay(int row, int col) const
 {
      float s_u = (col + .5) * s_u_const;
      float s_v = (row + .5) * s_v_const;
-
 
      Vector3f s = q + u * s_u - up * s_v;
 	

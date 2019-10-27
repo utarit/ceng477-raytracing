@@ -31,37 +31,36 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 {
 	float a = ray.direction.dotProduct(ray.direction); //dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
 	Vector3f tmp_v = ray.origin - center;
-	float b = 2 * ray.direction.dotProduct(tmp_v);
+	float b = ray.direction.dotProduct(tmp_v);
 	float c = tmp_v.dotProduct(tmp_v) - radius * radius;
 
-	float delta = b * b - 4 * a * c;
+	auto delta = 4 * b * b - 4 * a * c;
 	if (delta < 0) 
 	{
 		return {0, 0, 0};
 	}
+
 	else 
 	{
-		float t = (-b - sqrt(delta)) / (2.0 * a+ pScene->intTestEps);
-		Vector3f point = ray.getPoint(t);
-		Vector3f normal = (point- center) * (1/radius);
-		// std::cout << "Delta: " << delta << std::endl;
-		// std::cout << "T: " << t << std::endl;
-		// std::cout << "Point: " << point.x << " " << point.y << std::endl;
-		// std::cout << "Normal: " << normal.x << " " << normal.y << std::endl;
-		// std::cout << "-----------------------" << std::endl;
-		return {
-			delta>0?2:1, point, normal, t
-		};
-		/*if (delta > 0) 
-		{
-			ReturnVal result = { 2, point, normal };
-			return result;
+		auto sq = sqrt(b*b - a*c);
+		auto t_1 = (-b + sq) / a;
+		auto t_2 = (-b - sq) / a;
+
+		if (t_1 <= pScene->intTestEps && t_2 <= pScene->intTestEps) {
+			return {0, 0, 0, 0.0f};
 		}
-		else 
-		{
-			ReturnVal result = { 1, point, normal };
-			return result;
-		}*/
+		auto t = t_1 > pScene->intTestEps ?
+					(t_2 > pScene->intTestEps ?
+						min(t_1, t_2):
+						t_1):
+					t_2;
+	
+		Vector3f point = ray.getPoint(t);
+		Vector3f normal = (point - center) * (1 / radius);
+
+		return {
+			1, point, normal, t
+		};
 	}
 		
 
@@ -78,7 +77,10 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
 	v2 = pVertices->at(p2Index - 1);
 	v3 = pVertices->at(p3Index - 1);
 
+	ac = v1 - v3;
+	ab = v1 - v2;
 	normal = (v2-v1).crossProduct(v3-v1);
+	normal = normal * (1/normal.length());
 	area = 1/2 * (normal.length());
 }
 
@@ -114,12 +116,27 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	// float beta = normal.dotProduct(nb) / (normal.length() * normal.length());
 	// float gamma = normal.dotProduct(nc) / (normal.length() * normal.length());
 
+	auto ao = v1 - ray.origin;
+	auto A = determinant(ab, ac, ray.direction);
+	auto B = determinant(ao, ac, ray.direction) / A;
+	auto G = determinant(ab, ao, ray.direction) / A;
+	auto t = determinant(ab, ac, ao) / A;
+	
+	//std::cout << A << " " << B << " " << G << " " << t << std::endl;
+	if (t < pScene->intTestEps || G < 0 || B < 0 || G + B > 1){
+		return {0,0,0};
+	}
+	/*
+	
 	float a = v1.x - v2.x;
 	float b = v1.y - v2.y;
 	float c = v1.z - v2.z;
 	float d = v1.x - v3.x;
 	float e = v1.y - v3.y;
 	float f = v1.z - v3.z;
+	print("v1", v1);
+	print("v2", v2);
+	print("v3", v3);
 	float g = ray.direction.x;
 	float h = ray.direction.y;
 	float i = ray.direction.z;
@@ -136,11 +153,23 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	float M = a*eihf + b*gfdi + c*dheg;
 	float beta = (j*eihf+k*gfdi+l*dheg) / M;
 	float gamma = (i*akjb +e*jcal + d*blkc) / M;
-	float t = (f*akjb+e*jcal+d*blkc) / M;
+	
 
 	//if(t < 0 || t > 1) return {0}; // Tmin tmax'a bak
-	if(gamma < 0 || gamma > 1) return {0};
-	if(beta < 0 || beta > 1 - gamma) return {0};
+	if ( gamma < 0 || beta < 0 || gamma + beta > 1) {
+		//std::cout << "küçüğüm agam ben" << std::endl;
+		return {0};
+	}
+	else {
+	//std::cout << "gamma: " << gamma << " beta: " << beta << " M: " << M << std::endl;
+	}	
+	float t = (f*akjb+e*jcal+d*blkc) / M;
+	if (t <= pScene->intTestEps) {
+			return {0,0,0};
+		}
+	//if(gamma < 0 || gamma > 1) return {0};
+	//if(beta < 0 || beta > 1 - gamma) return {0};
+	*/
 	Vector3f point = ray.origin + ray.direction*t;
 	ReturnVal result = {1, point, normal, t};
 	return result;
@@ -171,7 +200,7 @@ ReturnVal Mesh::intersect(const Ray & ray) const
 	for(int i = 0; i < triangles.size(); i++){
 		Triangle triangle = triangles.at(i);
 		ReturnVal val =  triangle.intersect(ray);
-		if(val.intersectionStatus == 1 && val.t < tmin){
+		if(val.intersectionStatus > 0 && val.t < tmin){
 			tmin = val.t;
 			closestTriangle = &triangle;
 			minVal = val;
