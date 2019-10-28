@@ -31,6 +31,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 {
 	float a = ray.direction.dotProduct(ray.direction); //dotProduct(ray.direction, ray.direction); //ray.direction.x * ray.direction.x + ray.direction.y * ray.direction.y + ray.direction.z * ray.direction.z;
 	Vector3f tmp_v = ray.origin - center;
+	//tmp_v.normalize();
 	float b = ray.direction.dotProduct(tmp_v);
 	float c = tmp_v.dotProduct(tmp_v) - radius * radius;
 
@@ -56,7 +57,8 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 					t_2;
 	
 		Vector3f point = ray.getPoint(t);
-		Vector3f normal = (point - center) * (1 / radius);
+		Vector3f normal = (point - center);
+		normal.normalize();
 
 		return {
 			1, point, normal, t
@@ -79,8 +81,8 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
 
 	ac = v1 - v3;
 	ab = v1 - v2;
-	normal = (v2-v1).crossProduct(v3-v1);
-	normal = normal * (1/normal.length());
+	normal = (v3-v2).crossProduct(v1-v2);
+	normal.normalize();
 	area = 1/2 * (normal.length());
 }
 
@@ -134,8 +136,8 @@ Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIn
     : Shape(id, matIndex)
 {
 	// triangles = faces;
-	for(int i = 0; i < faces.size(); i++){
-		triangles.push_back(faces.at(i));
+	for(auto &face: faces){
+		triangles.push_back(face);
 	}
 
 }
@@ -145,15 +147,12 @@ Note that ReturnVal structure should hold the information related to the interse
 You should to declare the variables in ReturnVal structure you think you will need. It is in defs.h file. */
 ReturnVal Mesh::intersect(const Ray & ray) const
 {
-	float tmin = (unsigned) -1;
-	Triangle *closestTriangle = NULL;
+	float tmin = (unsigned long) -1;
 	ReturnVal minVal = {0};
-	for(int i = 0; i < triangles.size(); i++){
-		Triangle triangle = triangles.at(i);
+	for(auto &triangle: triangles){
 		ReturnVal val =  triangle.intersect(ray);
 		if(val.intersectionStatus > 0 && val.t < tmin){
 			tmin = val.t;
-			closestTriangle = &triangle;
 			minVal = val;
 		}
 	}

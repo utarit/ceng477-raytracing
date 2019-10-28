@@ -37,7 +37,7 @@ Vector3f Scene::pixelRenderer(const Ray &ray, const int recursionDepth) {
 					for(auto &light: pScene->lights)
 					{
 						Vector3f light_vector = light->position - val.point;
-						light_vector = light_vector * (1/light_vector.length());
+						light_vector.normalize();
 						Ray s = {val.point + light_vector*pScene->shadowRayEps, light_vector};
 						float t_light = s.gett(light->position);
 						bool contribute = true;
@@ -56,7 +56,7 @@ Vector3f Scene::pixelRenderer(const Ray &ray, const int recursionDepth) {
 							auto lightContr = light->computeLightContribution(val.point);
 							auto cos_th = max(0.0f, light_vector.dotProduct(val.normalVector));
 							Vector3f h = light_vector - ray.direction;
-							h = h * (1/h.length());
+							h.normalize();
 							Vector3f ks = material->specularRef;
 							float cosa = pow(max(0.0f, val.normalVector.dotProduct(h)), material->phongExp);
 							shading = shading + diffuse * cos_th * lightContr + ks * lightContr *cosa;
@@ -64,11 +64,11 @@ Vector3f Scene::pixelRenderer(const Ray &ray, const int recursionDepth) {
 							
 						}
 					}
+					
 					if (material->mirrorRef != 0 && recursionDepth) {
-						auto cosa = 2 * val.normalVector.dotProduct(ray.direction * -1);
+						auto cosa = -2 * val.normalVector.dotProduct(ray.direction);
 						auto w_r = val.normalVector * cosa + ray.direction;
-						w_r = w_r * (1/w_r.length());
-						
+						w_r.normalize();
 						Ray mirrorRay = {val.point + w_r * shadowRayEps, w_r};
 						auto mirrorShading =  pixelRenderer(mirrorRay, recursionDepth - 1);
 						shading = shading + material->mirrorRef * mirrorShading;
@@ -106,7 +106,6 @@ void Scene::renderScene(void)
 		Image image = {cam->imgPlane.nx, cam->imgPlane.ny}; 
 
 		const int number_of_cores = std::thread::hardware_concurrency() * 2;
-		const int widthStepSize = cam->imgPlane.nx / number_of_cores;
 		const int heightStepSize = cam->imgPlane.ny / number_of_cores;
 		auto threads = new thread[number_of_cores];
 
