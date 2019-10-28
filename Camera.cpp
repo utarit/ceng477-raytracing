@@ -21,7 +21,6 @@ Camera::Camera(int id,                      // Id of the camera
      this->up = up; // v
 
      u = up.crossProduct(gaze * -1);
-     print("gaze", gaze);
      m = pos + gaze * imgPlane.distance;
      q = m + u * imgPlane.left + up * imgPlane.top;
      s_u_const = (imgPlane.right - imgPlane.left) / imgPlane.nx;

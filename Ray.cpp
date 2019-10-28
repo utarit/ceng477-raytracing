@@ -19,6 +19,19 @@ Vector3f Ray::getPoint(float t) const
 float Ray::gett(const Vector3f & p) const
 {
     //TODO: check if direction.x == 0
-	return (p.x-origin.x) / direction.x;
+    if (direction.x) {
+	    return (p.x - origin.x) / direction.x;
+    }
+    else if (direction.y) {
+	    return (p.y - origin.y) / direction.y;
+    }
+    else if (direction.z) {
+        return (p.z - origin.z / direction.z);
+    }
+    else {
+        //not gonna happen
+        return 0;
+    }
+    
 }
 

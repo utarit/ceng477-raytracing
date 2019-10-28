@@ -108,14 +108,7 @@ Note that ReturnVal structure should hold the information related to the interse
 You should to declare the variables in ReturnVal structure you think you will need. It is in defs.h file. */
 ReturnVal Triangle::intersect(const Ray & ray) const
 {
-	// Vector3f p;
-	// Vector3f na = (v3-v2).crossProduct(p-v2);
-	// Vector3f nb = (v1-v3).crossProduct(p-v3);
-	// Vector3f nc = (v2-v1).crossProduct(p-v1);
-	// float alpha = normal.dotProduct(na) / (normal.length() * normal.length());
-	// float beta = normal.dotProduct(nb) / (normal.length() * normal.length());
-	// float gamma = normal.dotProduct(nc) / (normal.length() * normal.length());
-
+	
 	auto ao = v1 - ray.origin;
 	auto A = determinant(ab, ac, ray.direction);
 	auto B = determinant(ao, ac, ray.direction) / A;
@@ -126,50 +119,8 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	if (t < pScene->intTestEps || G < 0 || B < 0 || G + B > 1){
 		return {0,0,0};
 	}
-	/*
 	
-	float a = v1.x - v2.x;
-	float b = v1.y - v2.y;
-	float c = v1.z - v2.z;
-	float d = v1.x - v3.x;
-	float e = v1.y - v3.y;
-	float f = v1.z - v3.z;
-	print("v1", v1);
-	print("v2", v2);
-	print("v3", v3);
-	float g = ray.direction.x;
-	float h = ray.direction.y;
-	float i = ray.direction.z;
-	float j = v1.x - ray.origin.x;
-	float k = v1.y - ray.origin.y;
-	float l = v1.z - ray.origin.z;
-	float eihf = e*i - h*f;
-	float gfdi = g*f - d*i;
-	float dheg = d*h - e*g;
-	float akjb = a*k - j*b;
-	float jcal = j*c - a*l;
-	float blkc = b*l - k*c;
-
-	float M = a*eihf + b*gfdi + c*dheg;
-	float beta = (j*eihf+k*gfdi+l*dheg) / M;
-	float gamma = (i*akjb +e*jcal + d*blkc) / M;
 	
-
-	//if(t < 0 || t > 1) return {0}; // Tmin tmax'a bak
-	if ( gamma < 0 || beta < 0 || gamma + beta > 1) {
-		//std::cout << "küçüğüm agam ben" << std::endl;
-		return {0};
-	}
-	else {
-	//std::cout << "gamma: " << gamma << " beta: " << beta << " M: " << M << std::endl;
-	}	
-	float t = (f*akjb+e*jcal+d*blkc) / M;
-	if (t <= pScene->intTestEps) {
-			return {0,0,0};
-		}
-	//if(gamma < 0 || gamma > 1) return {0};
-	//if(beta < 0 || beta > 1 - gamma) return {0};
-	*/
 	Vector3f point = ray.origin + ray.direction*t;
 	ReturnVal result = {1, point, normal, t};
 	return result;

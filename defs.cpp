@@ -28,6 +28,20 @@ Vector3f Vector3f::crossProduct(const Vector3f &rhs) const {
 			x * rhs.y - y * rhs.x
 		};
     }
+bool Vector3f::operator== (const float &rhs) const{
+	return x == rhs && y == rhs && z == rhs;
+}
+
+bool Vector3f::operator== (const int &rhs) const{
+	return x == rhs && y == rhs && z == rhs;
+}
+
+bool Vector3f::operator!= (const int &rhs) const {
+	return !(*this == rhs);
+}
+bool Vector3f::operator!= (const float &rhs) const {
+	return !(*this == rhs);
+}
 
 float Vector3f::length() const {
 	return sqrt(x*x + y*y+ z*z);

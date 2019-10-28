@@ -9,15 +9,27 @@
 #include <vector>
 
 #include "Ray.h"
+
 //#include "defs.h"
 
 // Forward declarations to avoid cyclic references
 class Camera;
+class Image;
 class PointLight;
 class Material;
 class Shape;
 
 using namespace std;
+
+struct PartialScene {
+	// Partial Scene Information for multi thread rendering
+	int width;
+	int height;
+	int x;
+	int y;
+	Camera *cam_ref;
+	Image &img_ref;
+};
 
 // Class to hold everything related to a scene. 
 class Scene
@@ -41,7 +53,9 @@ public:
 
 private:
     // Write any other stuff here
-	static void renderPixel(int col, int row);
+	static void partialRenderer(const PartialScene& partialScene);
+	Vector3f pixelRenderer(const Ray &ray, const int recursionDepth);
+	
 };
 
 #endif

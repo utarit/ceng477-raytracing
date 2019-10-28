@@ -40,6 +40,10 @@ typedef struct Vector3f
 	Vector3f operator* (const float &t) const;
 	Vector3f operator*(const Vector3f &rhs) const;
 	void operator= (const Vector3f &rhs);
+	bool operator== (const float &rhs) const;
+	bool operator!= (const float &rhs) const;
+	bool operator== (const int &rhs) const;
+	bool operator!= (const int &rhs) const;
 	float length() const;
 	float dotProduct(const Vector3f &rhs) const;
 	Vector3f crossProduct(const Vector3f &rhs) const;

@@ -6,6 +6,7 @@
 #include "Image.h"
 #include "tinyxml2.h"
 #include <cmath>
+#include <thread>
 
 using namespace tinyxml2;
 
@@ -13,17 +14,138 @@ using namespace tinyxml2;
  * Must render the scene from each camera's viewpoint and create an image.
  * You can use the methods of the Image class to save the image as a PPM file. 
  */
+Vector3f Scene::pixelRenderer(const Ray &ray, const int recursionDepth) {
+
+				float tmin = (unsigned long) -1;
+				Shape *object = nullptr;
+				ReturnVal val;
+				for(auto &obj : pScene->objects)
+				{
+					auto val_tmp = obj->intersect(ray);
+					if(val_tmp.intersectionStatus > 0 && val_tmp.t < tmin)
+					{
+						tmin = val_tmp.t;
+						object = obj;
+						val = val_tmp;
+					}
+				}
+
+				if(object)
+				{
+					auto material = pScene->materials.at(object->matIndex-1);
+					Vector3f shading = pScene->ambientLight *  material->ambientRef;
+					for(auto &light: pScene->lights)
+					{
+						Vector3f light_vector = light->position - val.point;
+						light_vector = light_vector * (1/light_vector.length());
+						Ray s = {val.point + light_vector*pScene->shadowRayEps, light_vector};
+						float t_light = s.gett(light->position);
+						bool contribute = true;
+						for(auto &obj2 : pScene->objects)
+						{
+							ReturnVal shadow_val = obj2->intersect(s);
+							if(shadow_val.intersectionStatus > 0 && shadow_val.t >= pScene->intTestEps && shadow_val.t < t_light)
+							{
+								
+								contribute = false;
+								break;
+							}
+						}
+						if (contribute){
+							Vector3f diffuse = material->diffuseRef;
+							auto lightContr = light->computeLightContribution(val.point);
+							auto cos_th = max(0.0f, light_vector.dotProduct(val.normalVector));
+							Vector3f h = light_vector - ray.direction;
+							h = h * (1/h.length());
+							Vector3f ks = material->specularRef;
+							float cosa = pow(max(0.0f, val.normalVector.dotProduct(h)), material->phongExp);
+							shading = shading + diffuse * cos_th * lightContr + ks * lightContr *cosa;
+							// mirror
+							
+						}
+					}
+					if (material->mirrorRef != 0 && recursionDepth) {
+						auto cosa = 2 * val.normalVector.dotProduct(ray.direction * -1);
+						auto w_r = val.normalVector * cosa + ray.direction;
+						w_r = w_r * (1/w_r.length());
+						
+						Ray mirrorRay = {val.point + w_r * shadowRayEps, w_r};
+						auto mirrorShading =  pixelRenderer(mirrorRay, recursionDepth - 1);
+						shading = shading + material->mirrorRef * mirrorShading;
+					}
+					return shading;
+				} 
+				else 
+				{
+					return backgroundColor;
+				}
+}
+void Scene::partialRenderer(const PartialScene& partialScene) {
+	for(int y = partialScene.y; y < partialScene.y + partialScene.height; y++)
+		{
+			for(int x = partialScene.x; x < partialScene.x + partialScene.width; x++)
+			{
+				Ray ray = partialScene.cam_ref->getPrimaryRay(y, x);
+				
+					auto shading = pScene->pixelRenderer(ray, pScene->maxRecursionDepth);
+
+					partialScene.img_ref.setPixelValue(x, y, {
+						(unsigned char)min(max(shading.x, 0.0f), 255.0f),
+						(unsigned char)min(max(shading.y, 0.0f), 255.0f), 
+						(unsigned char)min(max(shading.z, 0.0f), 255.0f)
+						});
+			}
+
+		}
+}
+
 void Scene::renderScene(void)
 {
 	for(auto &cam: cameras)
 	{
 		Image image = {cam->imgPlane.nx, cam->imgPlane.ny}; 
 
+		const int number_of_cores = std::thread::hardware_concurrency() * 2;
+		const int widthStepSize = cam->imgPlane.nx / number_of_cores;
+		const int heightStepSize = cam->imgPlane.ny / number_of_cores;
+		auto threads = new thread[number_of_cores];
+
+		for (int th_id = 0; th_id < number_of_cores - 1; ++th_id) {
+			PartialScene partialScene = {
+				cam->imgPlane.nx,
+				heightStepSize,
+				0,
+				heightStepSize * th_id,
+				cam,
+				image
+			};
+			threads[th_id] = std::thread(partialRenderer, partialScene);
+		}
+		PartialScene partialScene = {
+			cam->imgPlane.nx,
+			cam->imgPlane.nx - widthStepSize * (number_of_cores - 1),
+			0,
+			heightStepSize * (number_of_cores - 1),
+			cam,
+			image
+		};
+		threads[number_of_cores - 1] = std::thread(partialRenderer, partialScene);
+
+		for (int th_id = 0; th_id < number_of_cores; ++th_id) {
+			threads[th_id].join();
+		}
+		image.saveImage(cam->imageName);
+		delete[] threads;
+
+
+
+
+
+	/*
 		for(int y = 0; y < cam->imgPlane.ny; y++)
 		{
 			for(int x = 0; x < cam->imgPlane.nx; x++)
 			{
-				// std::cout << "Pixel no: " << y << ", " << x <<  std::endl;
 				Ray ray = cam->getPrimaryRay(y, x);
 				float tmin = (unsigned long) -1;
 				Shape *object = nullptr;
@@ -92,11 +214,11 @@ void Scene::renderScene(void)
 						});
 				}
 			}
-
 		}
-			image.saveImage(cam->imageName);
+			*/
 
 	}
+
 }
 
 // Parses XML file. 
