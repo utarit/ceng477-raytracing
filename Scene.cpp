@@ -123,7 +123,7 @@ void Scene::renderScene(void)
 		}
 		PartialScene partialScene = {
 			cam->imgPlane.nx,
-			cam->imgPlane.nx - widthStepSize * (number_of_cores - 1),
+			cam->imgPlane.ny - heightStepSize * (number_of_cores - 1),
 			0,
 			heightStepSize * (number_of_cores - 1),
 			cam,
